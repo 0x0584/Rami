@@ -1,5 +1,7 @@
 package crami;
 
+import crami.Game.TYPE;
+
 public class Player {
 	private Score score;
 	private String nikename;
@@ -32,8 +34,17 @@ public class Player {
 		this.hand = hand;
 	}
 
-	public void insertCard(Card... card) {
-		/* choose one card */
+	public String toString() {
+		String str = "";
+
+		for(int i = 0; i < hand.length; ++i)
+			str += hand[i].toString( ) + "\n";
+
+		return nikename + "\n\n" + str;
+	}
+
+	public void insertCard(Card card, TYPE gametype) {
+		hand[gametype.ncards] = card;
 	}
 
 	public Card throwCard() {
@@ -45,6 +56,7 @@ public class Player {
 	}
 
 	public boolean isMseket() {
+		/* this is the fucking problem! */
 		return true;
 	}
 }

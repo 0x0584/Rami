@@ -1,5 +1,7 @@
 package crami;
 
+import java.util.Locale;
+import java.util.Scanner;
 import java.util.Vector;
 
 public class Game {
@@ -22,6 +24,7 @@ public class Game {
 	private Deck deck;
 	private TYPE gametype;
 	private Card fauxjoke;
+	private boolean istoken;
 
 	private Player[] players;
 	private final int nplayers;
@@ -36,6 +39,7 @@ public class Game {
 		gametype = TYPE.SIMPLE;
 		nplayers = 0;
 		fauxjoke = null;
+		istoken = false;
 	}
 
 	public Game(TYPE gametype, Player[] players) {
@@ -44,27 +48,56 @@ public class Game {
 		this.nplayers = players.length;
 		this.gametype = gametype;
 		fauxjoke = null;
+		istoken = false;
 	}
 
 	/* ------- methods ------- */
 	public void startGame() {
+		Scanner reader = new Scanner(System.in);
 		int turn = 0;
+
 		whostrun = players[++turn]; /* yallah a sidi, chkon li fih laeba! */
 
 		if(Debug.enabled) System.out.println(deck.toString( ));
 
 		fauxjoke = deck.deal(gametype, players); /* fareq a sidi dak r'ami */
-		
-		if(Debug.enabled) System.out.println(initHands( ));
-		
-		while(true) {
-			/* fauxjoke, r'ami */
-			if(turn == 0 || (!(gametype.fromtable) && turn < 4)) ;
-			else if(gametype.fromtable && turn < 4) ; /* fauxjoke, table, r'ami */
-			else if(gametype.fromtable && turn >= 4) ; /* table, r'ami */
-			else ; /* rami */
 
-			// whostrun.insertCard(deck.pickCard( ))
+		if(Debug.enabled) System.out.println(initHands( ));
+
+		while(true) {
+			Card selected = null;
+			boolean ttable = (gametype.fromtable && !(table.isEmpty( )));
+			boolean faux = (turn < 4 && !(istoken));
+
+			System.out.println("Select an option: ");
+
+			option: {
+				if(ttable) System.out.println("[t]able:\t"
+						+ table.lastElement( ).toString( ));
+
+				if(faux) System.out.println("[f]auxjoke:\t"
+						+ fauxjoke.toString( ));
+
+				System.out.print("[r]ami\n$ ");
+
+				switch(Card.FROM.fetch(reader.nextLine( )
+						.toLowerCase(Locale.getDefault( )).charAt(0))) {
+				/* @formatter:off*/
+				case 	 RAMI: selected = deck.pickCard( ); 		break;
+				case 	TABLE: selected = table.lastElement( );		break;
+				case FAUXJOKE: selected = fauxjoke; istoken = true;	break;
+				default: System.out.println("ERR\n");				break option;
+				/* @formatter:on */
+				}
+
+				reader.close( );
+			}
+
+			if(Debug.enabled) System.out.println(selected.toString( ));
+
+			whostrun.insertCard(selected, gametype);
+
+			if(Debug.enabled) System.out.println(whostrun.toString( ));
 
 			if(whostrun.isMseket( )) break; /* salat a maelen */
 

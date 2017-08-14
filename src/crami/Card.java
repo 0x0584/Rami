@@ -4,6 +4,27 @@ import java.util.Locale;
 
 public class Card {
 	/* ------- enumerations ------- */
+	public static enum FROM {
+		TABLE, FAUXJOKE, RAMI;
+		public static FROM fetch(int from){
+			switch(from) {
+			case 0: return TABLE;
+			case 1: return FAUXJOKE;
+			case 2: return RAMI;
+
+			default: return RAMI;
+			}
+		}
+		public static FROM fetch(char c){
+			switch(c) {
+			default:
+			case 'r': return RAMI;
+			case 'f': return FAUXJOKE;
+			case 't': return TABLE;
+			}
+		}
+	}
+
 	public static enum RANK {
 		ACE(1),
 
