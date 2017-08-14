@@ -3,6 +3,7 @@ package crami;
 import java.util.Vector;
 
 public class Game {
+	/* ------- enumerations ------- */
 	public static enum TYPE {
 		SIMPLE(4, 13, true), TALAJ(8, 14, false);
 
@@ -17,6 +18,7 @@ public class Game {
 		}
 	}
 
+	/* ------- local fields ------- */
 	private Deck deck;
 	private TYPE gametype;
 	private Card fauxjoke;
@@ -27,6 +29,7 @@ public class Game {
 
 	private Vector<Card> table;
 
+	/* ------- constructors ------- */
 	public Game() {
 		deck = null;
 		players = null;
@@ -43,14 +46,16 @@ public class Game {
 		fauxjoke = null;
 	}
 
+	/* ------- methods ------- */
 	public void startGame() {
 		int turn = 0;
 		whostrun = players[++turn]; /* yallah a sidi, chkon li fih laeba! */
 
-		deck.deal(gametype, players); /* fareq a sidi dak r'ami */
-		fauxjoke = deck.pickCard( );
+		if(Debug.enabled) System.out.println(deck.toString( ));
 
-		System.out.println(initHands( ));
+		fauxjoke = deck.deal(gametype, players); /* fareq a sidi dak r'ami */
+		
+		if(Debug.enabled) System.out.println(initHands( ));
 		
 		while(true) {
 			/* fauxjoke, r'ami */
@@ -69,13 +74,15 @@ public class Game {
 		}
 	}
 
+	/* ------- local functions ------- */
 	private String initHands() {
 		String str = "";
 
 		for(int iplayer = 0; iplayer < players.length; ++iplayer) {
 			for(int icard = 0; icard < gametype.ncards + 1; ++icard)
 				if(players[iplayer].getHand( )[icard] != null) {
-					str += players[iplayer].getHand( )[icard].toString( ) + "\n";
+					str += players[iplayer].getHand( )[icard].toString( )
+							+ "\n";
 				}
 			str += "\n";
 		}

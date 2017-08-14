@@ -3,6 +3,7 @@ package crami;
 import java.util.Locale;
 
 public class Card {
+	/* ------- enumerations ------- */
 	public static enum RANK {
 		ACE(1),
 

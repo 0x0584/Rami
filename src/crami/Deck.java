@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.Vector;
 
 public class Deck {
+	/* ------- local fields ------- */
 	private final int N_CARDS = Card.RANK.COUNT.value * Card.SUIT.COUNT.value
 			* Card.BACK.COUNT.value; /* #RANKS x #SUITES x TWO DECKS */
 	private Card[] card;
@@ -31,6 +32,7 @@ public class Deck {
 	public Deck(boolean shuff) {
 		this( );
 		if(shuff) shuffDeck( );
+
 	}
 
 	/* ------- methods ------- */
@@ -62,21 +64,26 @@ public class Deck {
 		return (isempty = !(used < N_CARDS)) ? null : card[used++];
 	}
 
-	public void deal(Game.TYPE gametype, Player[] players) {
-		int ncards = gametype.ncards + 1;
-		Card[][] hand = new Card[players.length][ncards];
+	public Card deal(Game.TYPE gametype, Player[] players) {
+		int ncards = gametype.ncards, nplayers = players.length;
+		Card[][] hand = new Card[nplayers][ncards + 1];
 
 		for(int icard = 0; icard < ncards; ++icard)
-			for(int player = 0; player < players.length; ++player)
+			for(int player = 0; player < nplayers; ++player)
 				hand[player][icard] = pickCard( );
 
-		for(int player = 0; player < players.length; ++player) {
-			hand[player][ncards - 1] = null;
+		for(int player = 0; player < nplayers; ++player) {
+			hand[player][ncards] = null;
 			players[player].setHand(hand[player]);
 		}
+
+		return pickCard( ); /* fauxjoke */
 	}
 
 	/* ------- override'd methods ------- */
+	/** this function use pickCard()
+	 * 
+	 * @return the whole deck as a String */
 	@Override
 	public String toString() {
 		/* pickCard modifies the used cards. keep a copy of the original # of
@@ -125,10 +132,19 @@ public class Deck {
 		return foo;
 	}
 
+	/** this trick works because Java guarantees that all arguments are
+	 * evaluated from left to right. so this trick implements the swap
+	 * method since there's no pointers in Java. so sad!
+	 * 
+	 * @usage foo = (bar, bar = foo)
+	 * 
+	 * @param c1
+	 *            the first Card
+	 * @param c1
+	 *            the second Card
+	 * 
+	 * @return c1 the first Card */
 	private Card swap(Card c1, Card c2) {
-		/* this trick works because Java guarantees that all arguments are
-		 * evaluated from left to right. so this trick implements the
-		 * swap-method since there's no pointers in Java. so sad! */
 		return c1;
 	}
 
