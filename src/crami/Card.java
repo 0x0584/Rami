@@ -5,7 +5,7 @@ import java.util.Locale;
 public class Card {
 	/* ------- enumerations ------- */
 	public static enum FROM {
-		TABLE, FAUXJOKE, RAMI;
+		TABLE, FAUXJOKE, RAMI, NULL;
 		public static FROM fetch(int from){
 			switch(from) {
 			case 0: return TABLE;
@@ -15,9 +15,10 @@ public class Card {
 			default: return RAMI;
 			}
 		}
+		
 		public static FROM fetch(char c){
 			switch(c) {
-			default:
+			default:  return NULL;
 			case 'r': return RAMI;
 			case 'f': return FAUXJOKE;
 			case 't': return TABLE;

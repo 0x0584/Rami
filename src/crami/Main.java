@@ -1,11 +1,16 @@
 package crami;
 
 public class Main {
-	public static void main(String[] args) {
+	public static void main(String[] args)  {
 		Debug.On( );
+		
+		run( );
+	}
 
-		new Game(Game.TYPE.TALAJ, new Player[] {
-				new Player("foo"), new Player("bar"), new Player("baz")
+	public static void run() {
+		new Game(Game.TYPE.SIMPLE, new Player[] {
+				new Player("foo"), new Player("bar")
 		}).startGame( );
 	}
+
 }

@@ -74,7 +74,7 @@ public class Deck {
 
 		for(int player = 0; player < nplayers; ++player) {
 			hand[player][ncards] = null;
-			players[player].setHand(hand[player]);
+			players[player].setHand(new Hand(hand[player], gametype));
 		}
 
 		return pickCard( ); /* fauxjoke */
@@ -110,7 +110,7 @@ public class Deck {
 		return card;
 	}
 
-	public boolean IsEmpty() {
+	public boolean isEmpty() {
 		return isempty;
 	}
 

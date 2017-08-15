@@ -1,8 +1,10 @@
 package crami;
 
 import java.util.Locale;
-import java.util.Scanner;
 import java.util.Vector;
+import java.io.*;
+
+import crami.Card.FROM;
 
 public class Game {
 	/* ------- enumerations ------- */
@@ -40,6 +42,7 @@ public class Game {
 		nplayers = 0;
 		fauxjoke = null;
 		istoken = false;
+		table = null;
 	}
 
 	public Game(TYPE gametype, Player[] players) {
@@ -49,14 +52,15 @@ public class Game {
 		this.gametype = gametype;
 		fauxjoke = null;
 		istoken = false;
+		table = new Vector<Card>( );
 	}
 
 	/* ------- methods ------- */
+	// @SuppressWarnings("unused")
 	public void startGame() {
-		Scanner reader = new Scanner(System.in);
-		int turn = 0;
-
-		whostrun = players[++turn]; /* yallah a sidi, chkon li fih laeba! */
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				System.in));
+		Card selected = null;
 
 		if(Debug.enabled) System.out.println(deck.toString( ));
 
@@ -64,64 +68,116 @@ public class Game {
 
 		if(Debug.enabled) System.out.println(initHands( ));
 
+		int turn = 0;
 		while(true) {
-			Card selected = null;
-			boolean ttable = (gametype.fromtable && !(table.isEmpty( )));
-			boolean faux = (turn < 4 && !(istoken));
+			boolean istable = (gametype.fromtable && !(table.isEmpty( )));
+			boolean isfaux = (turn < 4 && !(istoken)), isrami = !(deck
+					.isEmpty( ));
+			String str = "";
 
-			System.out.println("Select an option: ");
+			/* yallah a sidi, chkon li fih laeba! */
+			whostrun = players[(++turn) % nplayers];
 
-			option: {
-				if(ttable) System.out.println("[t]able:\t"
-						+ table.lastElement( ).toString( ));
+			// TODO: fix the case when the rami ends..
 
-				if(faux) System.out.println("[f]auxjoke:\t"
-						+ fauxjoke.toString( ));
+			str += whostrun.getNickname( ) + ", please, select an option:";
+			str += "\n\n";
 
-				System.out.print("[r]ami\n$ ");
+			/* if taking cards from table is allowed */
+			if(istable) str += "[t]\t" + table.lastElement( ).toString( )
+					+ "\n";
 
-				switch(Card.FROM.fetch(reader.nextLine( )
-						.toLowerCase(Locale.getDefault( )).charAt(0))) {
-				/* @formatter:off*/
-				case 	 RAMI: selected = deck.pickCard( ); 		break;
-				case 	TABLE: selected = table.lastElement( );		break;
-				case FAUXJOKE: selected = fauxjoke; istoken = true;	break;
-				default: System.out.println("ERR\n");				break option;
-				/* @formatter:on */
+			/* if it is the first turn and the fauxjoke is not token */
+			if(isfaux) str += "[f]\t" + fauxjoke.toString( ) + "\n";
+
+			if(isrami) str += "[r]\n$ "; /* card form rami is always allowed */
+			else ; /* re-shuffle the deck from the rested cards */
+
+			System.out.print(str);
+
+			/* getting from where the player would take the card */
+			Card.FROM tmp = FROM.NULL;
+
+			while(tmp == FROM.NULL) {
+				String strerr = "";
+
+				try {
+					switch(tmp = Card.FROM.fetch(reader.readLine( )
+							.toLowerCase(Locale.getDefault( )).charAt(0))) {
+					/* @formatter:off*/
+					case 	 RAMI: selected = deck.pickCard( ); 	break;
+					case 	TABLE: if(istable) {
+									  selected = table.lastElement( );
+									  strerr = "";
+								   } else { 
+									   tmp = Card.FROM.NULL;	
+									   strerr = "taking cards from ";
+									   strerr += "table is not allowed\n";
+								   }
+																	break;
+					case FAUXJOKE: if(isfaux) { 
+									  selected = fauxjoke; 
+									  istoken = true;
+									  strerr = "";
+								   } else {
+									   strerr = "faux is not available\n";
+									   tmp = Card.FROM.NULL;
+								   }
+																	break;
+					default: 
+					case     NULL: strerr = "ERR\n";
+					/* @formatter:on */
+					}
+					
+					System.out.print(strerr);
+				} catch(IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace( );
 				}
-
-				reader.close( );
 			}
 
-			if(Debug.enabled) System.out.println(selected.toString( ));
+			if(Debug.enabled) System.out.println("selected: "
+					+ selected.toString( ));
 
-			whostrun.insertCard(selected, gametype);
+			/* insert the card in the player's hand */
+			whostrun.getHand( ).insertCard(selected);
 
 			if(Debug.enabled) System.out.println(whostrun.toString( ));
 
 			if(whostrun.isMseket( )) break; /* salat a maelen */
 
-			table.add(whostrun.throwCard( )); /* throw a card */
+			table.add(whostrun.getHand( ).throwCard( )); /* throw a card */
 
-			whostrun = players[(++turn) % nplayers]; /* chkon li fih laeba */
+			if(Debug.enabled) System.out.println(table.lastElement( )
+					.toString( ));
+		}
+
+		try {
+			reader.close( );
+		} catch(IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace( );
 		}
 	}
 
 	/* ------- local functions ------- */
 	private String initHands() {
-		String str = "";
+		String strhands = "";
 
 		for(int iplayer = 0; iplayer < players.length; ++iplayer) {
-			for(int icard = 0; icard < gametype.ncards + 1; ++icard)
-				if(players[iplayer].getHand( )[icard] != null) {
-					str += players[iplayer].getHand( )[icard].toString( )
-							+ "\n";
+			strhands += players[iplayer].getNickname( ) + "\n\n";
+			for(int icard = 0; icard < gametype.ncards + 1; ++icard) {
+				if(players[iplayer].getHand( ).getCardAt(icard) != null) {
+					String strcard = players[iplayer].getHand( )
+							.getCardAt(icard).toString( );
+					strhands += strcard + "\n";
 				}
-			str += "\n";
+			}
+			strhands += "\n";
 		}
 
-		str += fauxjoke.toString( ) + "\n";
+		strhands += fauxjoke.toString( ) + "\n";
 
-		return str;
+		return strhands;
 	}
 }

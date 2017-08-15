@@ -1,12 +1,12 @@
 package crami;
 
-import crami.Game.TYPE;
-
 public class Player {
+	/* ------- local fields ------- */
 	private Score score;
-	private String nikename;
-	private Card[] hand;
+	private String nickname;
+	private Hand hand;
 
+	/* ------- constructors ------- */
 	public Player() {
 		score = new Score( );
 		hand = null;
@@ -14,7 +14,19 @@ public class Player {
 
 	public Player(String nikename) {
 		this( );
-		this.nikename = nikename;
+		this.nickname = nikename;
+	}
+
+	public boolean isMseket() {
+		/* this is the fucking problem! */
+		return false;
+	}
+
+	/* ------- override'd methods ------- */
+	@Override
+	public String toString() {
+		/* nickname score hand */
+		return nickname + "\n\n" + hand.toString( );
 	}
 
 	/* ------- getters ------- */
@@ -22,41 +34,15 @@ public class Player {
 		return score;
 	}
 
-	public String getNikename() {
-		return nikename;
+	public String getNickname() {
+		return nickname;
 	}
 
-	public Card[] getHand() {
+	public Hand getHand() {
 		return hand;
 	}
 
-	public void setHand(Card[] hand) {
+	public void setHand(Hand hand) {
 		this.hand = hand;
-	}
-
-	public String toString() {
-		String str = "";
-
-		for(int i = 0; i < hand.length; ++i)
-			str += hand[i].toString( ) + "\n";
-
-		return nikename + "\n\n" + str;
-	}
-
-	public void insertCard(Card card, TYPE gametype) {
-		hand[gametype.ncards] = card;
-	}
-
-	public Card throwCard() {
-		return null;
-	}
-
-	public boolean takeFromDeck() {
-		return true;
-	}
-
-	public boolean isMseket() {
-		/* this is the fucking problem! */
-		return true;
 	}
 }
