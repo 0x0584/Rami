@@ -2,6 +2,8 @@ package crami;
 
 import java.util.Locale;
 
+import crami.Game.TYPE;
+
 public class Card {
 	/* ------- enumerations ------- */
 	public static enum FROM {
@@ -153,6 +155,7 @@ public class Card {
 	private SUIT suit;
 	private BACK back;
 	private int deckorder;
+	private boolean isjoker;
 
 	/* ------- constructors ------- */
 	public Card() {
@@ -160,6 +163,7 @@ public class Card {
 		this.rank = RANK.ACE;
 		this.suit = SUIT.SPADES;
 		this.back = BACK.BLUE;
+		isjoker = false;
 	}
 
 	public Card(BACK back, RANK rank, SUIT suit, int deckorder) {
@@ -167,6 +171,7 @@ public class Card {
 		this.rank = rank;
 		this.suit = suit;
 		this.back = back;
+		isjoker = false;
 	}
 
 	/* ------- getters ------- */
@@ -186,9 +191,27 @@ public class Card {
 		return back;
 	}
 
+	public boolean isJoker() {
+		return isjoker;
+	}
+
 	/* ------- setters ------- */
-	public void setDeckorder(int deckorder) {
+	public void setDeckOrder(int deckorder) {
 		this.deckorder = deckorder;
+	}
+
+	public void setAsJoker(boolean isit) {
+		isjoker = isit;
+	}
+
+	public Card checkJoker(Game.TYPE gametype, Card faux) {
+		SUIT fs = faux.getSuit( ), cs = this.getSuit( );
+		RANK fr = faux.getRank( ), cr = this.getRank( ), TWO = Card.RANK.TWO;
+		boolean usetjoker = (gametype == TYPE.TALAJ) ? (cr == TWO) : (cr == fr);
+
+		if((cs.value % 2 != fs.value % 2) && usetjoker) this.isjoker = true;
+
+		return this;
 	}
 
 	/* ------- override'd function ------- */
@@ -196,8 +219,8 @@ public class Card {
 	public String toString() {
 		/* R (A♠) Ace Of Spades */
 		return deckorder + "\t" + back.name( ).substring(0, 1) + "\t("
-				+ toSymbol( ) + ")\t" + strcap(rank.name( )) + " Of "
-				+ strcap(suit.name( ));
+				+ toSymbol( ) + (isjoker ? " JOKER" : " NOT JOKER") + ")\t"
+				+ strcap(rank.name( )) + " Of " + strcap(suit.name( ));
 
 	}
 
@@ -218,6 +241,8 @@ public class Card {
 				str += "(" + toSymbol( ) + ")";
 			} else if(opt[i].equals("F") || opt[i].equals("f")) {
 				str += strcap(rank.name( )) + " Of " + strcap(suit.name( ));
+			} else if(opt[i].equals("J") || opt[i].equals("j")) {
+				str += isjoker ? "J" : "";
 			}
 		}
 
@@ -247,5 +272,4 @@ public class Card {
 		return str.substring(0, 1).toUpperCase(Locale.getDefault( ))
 				+ str.substring(1).toLowerCase(Locale.getDefault( ));
 	}
-
 }

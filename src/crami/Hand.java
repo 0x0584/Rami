@@ -52,7 +52,7 @@ public class Hand {
 			lastindex = tmp - 1;
 		}
 
-		Card it = hand[lastindex]; /* convert nullindex to real index */
+		Card it = hand[lastindex];
 		hand[lastindex] = null;
 
 		/* ---------------------- DEBUG ---------------------- */
@@ -66,7 +66,7 @@ public class Hand {
 		String str = "";
 
 		for(int i = 0; i <= gametype.ncards; ++i)
-			if(hand[i] != null) str += hand[i].toString("%s");
+			if(hand[i] != null) str += hand[i].toString("%s%j");
 
 		return str + "\n";
 	}

@@ -15,7 +15,7 @@ public class Game {
 		public final int nplayers;
 		/* # of cards in a player's hand */
 		public final int ncards;
-		/* whether taking cards from the table 
+		/* whether taking cards from the table
 		 * is allowed or not */
 		public final boolean tableallowed;
 
@@ -29,7 +29,7 @@ public class Game {
 	/* ------- local fields ------- */
 	private Deck deck;
 	private TYPE gametype;
-	private Card fauxjoke;
+	private Card fauxjoker;
 	private boolean istoken;
 
 	private Player[] player;
@@ -45,7 +45,7 @@ public class Game {
 		player = null;
 		gametype = TYPE.SIMPLE;
 		N_PLAYERS = 0;
-		fauxjoke = null;
+		fauxjoker = null;
 		istoken = false;
 		table = null;
 	}
@@ -55,7 +55,7 @@ public class Game {
 		this.player = players;
 		this.N_PLAYERS = players.length;
 		this.gametype = gametype;
-		fauxjoke = null;
+		fauxjoker = null;
 		istoken = false;
 		table = new Vector<Card>( );
 	}
@@ -84,7 +84,7 @@ public class Game {
 
 		/* if it is the first turn and the fauxjoke is not token */
 		if(factor[Card.FROM.FAUXJOKER.val]) str += "[f]\t"
-				+ fauxjoke.toString("%s") + "\n";
+				+ fauxjoker.toString("%s") + "\n";
 
 		if(factor[Card.FROM.RAMI.val]) str += "[r]\n$ "; /* card form rami is
 														 * always allowed */
@@ -114,7 +114,7 @@ public class Game {
 						   }
 															break;
 			case FAUXJOKER: if(factor[Card.FROM.FAUXJOKER.val]) { 
-							  selected = fauxjoke; 
+							  selected = fauxjoker; 
 							  istoken = true;
 							  strerr = "";
 						   } else {
@@ -136,14 +136,14 @@ public class Game {
 
 		/* ---------------------- DEBUG ---------------------- */
 		if(Debug.enabled) {
-			System.out.println("selected: " + selected.toString( ));
+			System.out.println("selected: " + selected.toString("%s%j"));
 		}
 
 		return selected;
 	}
 
 	public void startGame() {
-		fauxjoke = deck.deal(gametype, player); /* fareq a sidi dak r'ami */
+		fauxjoker = deck.deal(gametype, player); /* fareq a sidi dak r'ami */
 
 		/* ---------------------- DEBUG ---------------------- */
 		if(Debug.enabled) System.out.println(initHands( ));
@@ -156,8 +156,8 @@ public class Game {
 			/* --------------------- DEBUG ---------------------- */
 			if(Debug.enabled) System.out.println(current.getNickname( )
 					+ ", please, select an option:\n\n");
-
-			/* 1. insert the selected card in hand */
+			/* 1.1 select a card first */
+			/* 1.2 then, insert the selected card in hand */
 			current.getHand( ).insertCard(cardSelection(new boolean[] {
 					/* table, if allowed and not empty */
 					(gametype.tableallowed && !(table.isEmpty( ))),
@@ -165,7 +165,7 @@ public class Game {
 					(turn < gametype.nplayers && !(istoken)),
 					/* rami, i'm not sure if this one is necessary */
 					!(deck.isEmpty( ))
-			}));
+			}).checkJoker(gametype, fauxjoker));
 
 			/* 2. check whether you're mseket or not */
 			if(current.isMseket( )) break; /* salat a maelen */
@@ -194,14 +194,14 @@ public class Game {
 			for(int icard = 0; icard < gametype.ncards + 1; ++icard) {
 				if(player[iplayer].getHand( ).getCardAt(icard) != null) {
 					String strcard = player[iplayer].getHand( )
-							.getCardAt(icard).toString("%s");
+							.getCardAt(icard).toString("%s%j");
 					strhands += strcard;
 				}
 			}
 			strhands += "\n";
 		}
 
-		strhands += "\nfaux: " + fauxjoke.toString("%s") + "\n";
+		strhands += "\nfaux: " + fauxjoker.toString("%s%j") + "\n";
 
 		return strhands;
 	}

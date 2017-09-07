@@ -37,7 +37,6 @@ public class Deck {
 		if(Debug.enabled) System.out.println(this.toString( ));
 	}
 
-	
 	/* ------- methods ------- */
 	public void shuffDeck() {
 		/* TODO:
@@ -50,7 +49,7 @@ public class Deck {
 		 * 2 == really mixed
 		 * 3 == mixed
 		 * 4 == slightly mixed
-		 * 5 == really? 
+		 * 5 == really?
 		 * 6 == no seriously? */
 		int ratio = (randInt(5) + 2);
 		int index0, index1, size = isused.capacity( );
@@ -80,6 +79,8 @@ public class Deck {
 	}
 
 	public Card deal(Game.TYPE gametype, Player[] players) {
+		resetJoker( );
+
 		int ncards = gametype.ncards, nplayers = players.length;
 		int incr = (gametype == Game.TYPE.SIMPLE ? 1 : 2);
 
@@ -94,12 +95,23 @@ public class Deck {
 			}
 		}
 
-		for(int player = 0; player < nplayers; ++player) {
-			hand[player][ncards] = null;
-			players[player].setHand(new Hand(hand[player], gametype));
+		Card faux = pickCard( );
+
+		for(int iplayer = 0; iplayer < nplayers; ++iplayer) {
+			for(int icard = 0; icard < ncards; ++icard) {
+				hand[iplayer][icard].checkJoker(gametype, faux);
+			}
+
+			hand[iplayer][ncards] = null; /* set the last card to null */
+			players[iplayer].setHand(new Hand(hand[iplayer], gametype));
 		}
 
-		return pickCard( ); /* fauxjoke */
+		return faux;/* fauxjoke */
+	}
+
+	private void resetJoker() {
+		for(int i = 0; i < card.length; ++i)
+			card[i].setAsJoker(false);
 	}
 
 	/* ------- override'd methods ------- */
