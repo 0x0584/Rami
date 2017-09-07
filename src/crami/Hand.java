@@ -7,29 +7,30 @@ import java.io.InputStreamReader;
 public class Hand {
 	private Card[] hand;
 	private Game.TYPE gametype;
-	private int nullindex;
+	private int lastindex; /* this is the index of the last card in-card */
 
 	public Hand(Card[] hand, Game.TYPE gametype) {
 		this.hand = hand;
 		this.gametype = gametype;
-		nullindex = gametype.ncards;
+		lastindex = gametype.ncards;
 	}
 
 	/* ------- methods ------- */
 	public void insertCard(Card card) {
-		hand[nullindex] = card;
-		nullindex = -1;
+		hand[lastindex] = card;
+		lastindex = -1; /* not sure why! */
 	}
 
 	public Card throwCard() {
-		int tmp = -1;
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				System.in));
 		/* TODO: find a better way! */
 
-		// if(Debug.enabled) System.out.println(toString( ));
+		/* ---------------------- DEBUG ---------------------- */
+		if(Debug.enabled) System.out.println("before:\n" + toString( ));
 
-		while(tmp < 1 || tmp > 14) {
+		int tmp = -1;
+		while(tmp < 1 || tmp > (gametype.ncards + 1)) {
 			System.out.println("chose a card from 1 to 14");
 
 			try {
@@ -40,18 +41,22 @@ public class Hand {
 				e.printStackTrace( );
 			}
 
-			nullindex = tmp - 1;
+			lastindex = tmp - 1;
 		}
 
-		Card it = hand[nullindex]; /* convert nullindex to real index */
-		hand[nullindex] = null;
+		Card it = hand[lastindex]; /* convert nullindex to real index */
+		hand[lastindex] = null;
 
-		
 		try {
 			reader.close( );
 		} catch(IOException e) {
-			e.printStackTrace( );
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		/* ---------------------- DEBUG ---------------------- */
+		if(Debug.enabled) System.out.println("after:\n" + toString( ));
+
 		return it;
 	}
 

@@ -5,23 +5,34 @@ import java.util.Locale;
 public class Card {
 	/* ------- enumerations ------- */
 	public static enum FROM {
-		TABLE, FAUXJOKE, RAMI, NULL;
-		public static FROM fetch(int from){
+		TABLE(0), FAUXJOKER(1), RAMI(2), NULL(-1);
+		
+		public final int val;
+
+		FROM(final int val) {
+			this.val = val;
+		}
+
+		public static FROM fetch(int from) {
 			switch(from) {
+			/* @formatter:off */
 			case 0: return TABLE;
-			case 1: return FAUXJOKE;
+			case 1: return FAUXJOKER;
 			case 2: return RAMI;
 
 			default: return RAMI;
+			/* @formatter:on */
 			}
 		}
-		
-		public static FROM fetch(char c){
+
+		public static FROM fetch(char c) {
 			switch(c) {
+			/* @formatter:off */
 			default:  return NULL;
 			case 'r': return RAMI;
-			case 'f': return FAUXJOKE;
+			case 'f': return FAUXJOKER;
 			case 't': return TABLE;
+			/* @formatter:on */
 			}
 		}
 	}
@@ -35,9 +46,7 @@ public class Card {
 
 		JACK(11), QUEEN(12), KING(13),
 
-		COUNT(13),
-
-		JOKER(0);
+		COUNT(13);
 
 		public final int value;
 
@@ -60,9 +69,9 @@ public class Card {
 			case 10: return  TEN;
 			case 11: return  JACK;
 			case 12: return  QUEEN;
+			default: 
 			case 13: return  KING;
 
-			default: return  JOKER;
 			/* @formatter:on */
 			}
 		}
@@ -165,7 +174,7 @@ public class Card {
 		return rank;
 	}
 
-	public SUIT getSuite() {
+	public SUIT getSuit() {
 		return suit;
 	}
 
@@ -202,7 +211,8 @@ public class Card {
 		case   ACE:
 		case  KING:
 		case QUEEN:
-		case  JACK: str += rank.name( ).substring(0, 1).toUpperCase( ) + " "; break;
+		case  JACK: str += rank.name( ).substring(0, 1).toUpperCase( ) 
+						+ " "; 										  break;
 		/* @formatter:on */
 		}
 

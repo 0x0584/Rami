@@ -32,7 +32,9 @@ public class Deck {
 	public Deck(boolean shuff) {
 		this( );
 		if(shuff) shuffDeck( );
-
+		
+		/* ---------------------- DEBUG ---------------------- */
+		if(Debug.enabled) System.out.println(this.toString( ));
 	}
 
 	/* ------- methods ------- */
