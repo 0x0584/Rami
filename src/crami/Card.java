@@ -217,7 +217,7 @@ public class Card {
 	/* ------- override'd function ------- */
 	@Override
 	public String toString() {
-		/* R (A♠) Ace Of Spades */
+		/* R (A♠ JOKER) Ace Of Spades */
 		return deckorder + "\t" + back.name( ).substring(0, 1) + "\t("
 				+ toSymbol( ) + (isjoker ? " JOKER" : " NOT JOKER") + ")\t"
 				+ strcap(rank.name( )) + " Of " + strcap(suit.name( ));

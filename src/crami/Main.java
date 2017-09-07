@@ -14,12 +14,14 @@ public class Main {
 	public static void main(String[] args) {
 		Debug.On( );
 
-		System.out.println(new Card(Card.BACK.BLUE, Card.RANK.ACE,
-				Card.SUIT.CLUBS, 10).checkJoker(Game.TYPE.SIMPLE,
-				new Card(Card.BACK.BLUE, Card.RANK.ACE, Card.SUIT.DIAMONDS, 9))
-				.toString( ));
+		System.out.println(new Player( ).isRandked(new Card[] {
+			new Card(Card.BACK.BLUE, Card.RANK.ACE, Card.SUIT.DIAMONDS, 10), 
+			new Card(Card.BACK.BLUE, Card.RANK.ACE, Card.SUIT.DIAMONDS, 11),
+			new Card(Card.BACK.BLUE, Card.RANK.ACE, Card.SUIT.DIAMONDS, 12),
+			new Card(Card.BACK.RED, Card.RANK.ACE, Card.SUIT.DIAMONDS, 13)
+		}) ? "TRUE" : "FALSE");
 
-		run( );
+		//run( );
 	}
 
 	public static void run() {

@@ -33,21 +33,10 @@ public class Player {
 		return c1;
 	}
 
-	private boolean isSameRank(Card[] card, boolean isrank) {
-		Object foo = isrank ? card[0].getRank( ) : card[0].getSuit( );
-
-		for(int i = 1; i < card.length; ++i) {
-			Object bar = isrank ? card[i].getRank( ) : card[i].getSuit( );
-			if(bar != foo) return false;
-		}
-
-		return true;
-	}
-
-	private boolean isSuccessive(Card[] part) {
+	public boolean isSuited(Card[] part) {
 		/* TODO: implement this description
 		 * 
-		 * Description: a successive is a set of cards which has the same
+		 * Description: a suited is a set of cards which has the same
 		 * `suit` but with successive ranks.
 		 * 
 		 * (2♠)(3♠)(4♠) or (J♥)(Q♥)(K♥)(A♥) or (9♣)(10♣)(J♣)(Q♣)(K♣)
@@ -58,11 +47,56 @@ public class Player {
 		 * 2. if the #cards != N, where N is (rank(max) - rank(min) - 1)
 		 * then return false
 		 * 3. */
+
+		boolean samesuit = true;
+
+		for(int icard = 0; icard < part.length - 1; ++icard) {
+			samesuit &= (part[icard].getSuit( ) == part[icard + 1].getSuit( ));
+		}
+
+		for(int icard = 0; icard < part.length; ++icard) {
+
+		}
+
 		return false;
 	}
 
-	private boolean isSuited(Card[] part) {
-		return false;
+	public boolean isRandked(Card[] part) {
+		/* TODO: implement this description
+		 * # in case of joker
+		 * 
+		 * Description: a ranked is a set of cards which has the same
+		 * `rank` but with different suits.
+		 * 
+		 * (A♠)(A♥)(A♣) or (J♥)(J♣)(J♠)(J♦) */
+
+		if(part.length != 3 && part.length != 4) return false;
+
+		boolean samerank = true, spades, clubs, hearts, diams;
+		spades = clubs = hearts = diams = false;
+
+		for(int icard = 1; icard < part.length; ++icard) {
+			samerank &= (part[icard - 1].getRank( ) == part[icard].getRank( ));
+
+			switch(part[icard - 1].getSuit( )) {
+			/* @formatter:off*/
+			case CLUBS:		 clubs = !(clubs)  ? true: false; break;
+			case DIAMONDS: 	 diams = !(diams)  ? true: false; break;
+			case HEARTS: 	hearts = !(hearts) ? true: false; break;
+			case SPADES: 	spades = !(spades) ? true: false; break;
+			default:					    				  break;
+			/* @formatter:on */
+			}
+		}
+
+		int suitcount = 0;
+		for(int isuit = 0; isuit < 4; ++isuit) {
+			if(new boolean[] {
+					spades, diams, hearts, clubs
+			}[isuit]) ++suitcount;
+		}
+
+		return samerank && suitcount > 2;
 	}
 
 	public boolean isMseket() {
