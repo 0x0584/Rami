@@ -32,22 +32,33 @@ public class Deck {
 	public Deck(boolean shuff) {
 		this( );
 		if(shuff) shuffDeck( );
-		
+
 		/* ---------------------- DEBUG ---------------------- */
 		if(Debug.enabled) System.out.println(this.toString( ));
 	}
 
+	
 	/* ------- methods ------- */
 	public void shuffDeck() {
-		/* TODO: make this shuffle use modes of shuffle t make it look more
-		 * realistic. done */
+		/* TODO:
+		 * make this shuffle use modes of shuffle t make it look more
+		 * realistic.
+		 * 
+		 * done */
 		Vector<Integer> isused = new Vector<Integer>(N_CARDS);
+		/* this is how much the deck would be mixed up
+		 * 2 == really mixed
+		 * 3 == mixed
+		 * 4 == slightly mixed
+		 * 5 == really? 
+		 * 6 == no seriously? */
+		int ratio = (randInt(5) + 2);
 		int index0, index1, size = isused.capacity( );
 
 		for(int index = 0; index < size; ++index)
 			isused.addElement(new Integer(index));
 
-		for(int c = 0; c < N_CARDS / 2; ++c) {
+		for(int c = 0; c < (N_CARDS / ratio); ++c) {
 			index0 = pickRandElement(isused, size--);
 			index1 = pickRandElement(isused, size--);
 
@@ -55,10 +66,12 @@ public class Deck {
 			card[index0] = swap(card[index1], card[index1] = card[index0]);
 		}
 
-		for(int index = 0; index < N_CARDS; ++index)
-			card[index].setDeckorder(index);
+		// for(int index = 0; index < N_CARDS; ++index)
+		// card[index].setDeckorder(index);
 
 		isshuffled = true;
+
+		if(Debug.enabled) System.out.println("ratio is: " + ratio);
 	}
 
 	public Card pickCard() {
@@ -68,11 +81,18 @@ public class Deck {
 
 	public Card deal(Game.TYPE gametype, Player[] players) {
 		int ncards = gametype.ncards, nplayers = players.length;
+		int incr = (gametype == Game.TYPE.SIMPLE ? 1 : 2);
+
 		Card[][] hand = new Card[nplayers][ncards + 1];
 
-		for(int icard = 0; icard < ncards; ++icard)
-			for(int player = 0; player < nplayers; ++player)
+		for(int icard = 0; icard < ncards; icard += incr) {
+			for(int player = 0; player < nplayers; ++player) {
 				hand[player][icard] = pickCard( );
+				if(gametype == Game.TYPE.TALAJ) {
+					hand[player][icard + 1] = pickCard( );
+				}
+			}
+		}
 
 		for(int player = 0; player < nplayers; ++player) {
 			hand[player][ncards] = null;

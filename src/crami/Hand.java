@@ -8,11 +8,22 @@ public class Hand {
 	private Card[] hand;
 	private Game.TYPE gametype;
 	private int lastindex; /* this is the index of the last card in-card */
+	private static BufferedReader reader = new BufferedReader(
+			new InputStreamReader(System.in));
 
 	public Hand(Card[] hand, Game.TYPE gametype) {
 		this.hand = hand;
 		this.gametype = gametype;
 		lastindex = gametype.ncards;
+	}
+
+	static public void cleanUp() {
+		try {
+			reader.close( );
+		} catch(IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace( );
+		}
 	}
 
 	/* ------- methods ------- */
@@ -22,8 +33,6 @@ public class Hand {
 	}
 
 	public Card throwCard() {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				System.in));
 		/* TODO: find a better way! */
 
 		/* ---------------------- DEBUG ---------------------- */
@@ -31,13 +40,12 @@ public class Hand {
 
 		int tmp = -1;
 		while(tmp < 1 || tmp > (gametype.ncards + 1)) {
-			System.out.println("chose a card from 1 to 14");
+			System.out.println("chose a card from 1 to "
+					+ (gametype.ncards + 1));
 
 			try {
 				tmp = Integer.parseInt(reader.readLine( ));
-			} catch(NumberFormatException e) {
-				e.printStackTrace( );
-			} catch(IOException e) {
+			} catch(NumberFormatException | IOException e) {
 				e.printStackTrace( );
 			}
 
@@ -47,13 +55,6 @@ public class Hand {
 		Card it = hand[lastindex]; /* convert nullindex to real index */
 		hand[lastindex] = null;
 
-		try {
-			reader.close( );
-		} catch(IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		/* ---------------------- DEBUG ---------------------- */
 		if(Debug.enabled) System.out.println("after:\n" + toString( ));
 
@@ -65,9 +66,9 @@ public class Hand {
 		String str = "";
 
 		for(int i = 0; i <= gametype.ncards; ++i)
-			if(hand[i] != null) str += hand[i].toString( ) + "\n";
+			if(hand[i] != null) str += hand[i].toString("%s");
 
-		return str;
+		return str + "\n";
 	}
 
 	public Card getCardAt(int index) {

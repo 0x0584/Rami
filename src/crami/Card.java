@@ -6,7 +6,7 @@ public class Card {
 	/* ------- enumerations ------- */
 	public static enum FROM {
 		TABLE(0), FAUXJOKER(1), RAMI(2), NULL(-1);
-		
+
 		public final int val;
 
 		FROM(final int val) {
@@ -199,6 +199,29 @@ public class Card {
 				+ toSymbol( ) + ")\t" + strcap(rank.name( )) + " Of "
 				+ strcap(suit.name( ));
 
+	}
+
+	public String toString(String pattern) {
+		if(pattern.length( ) == 0 || pattern == null) return toString( );
+
+		String[] opt = pattern.split("%");
+		String str = "";
+
+		for(int i = 1; i < opt.length; ++i, str += " ") {
+			if(opt[i].equals("d") || opt[i].equals("D")) {
+				str += deckorder;
+			} else if(opt[i].equals("b")) {
+				str += back.name( ).substring(0, 1);
+			} else if(opt[i].equals("B")) {
+				str += back.name( );
+			} else if(opt[i].equals("S") || opt[i].equals("s")) {
+				str += "(" + toSymbol( ) + ")";
+			} else if(opt[i].equals("F") || opt[i].equals("f")) {
+				str += strcap(rank.name( )) + " Of " + strcap(suit.name( ));
+			}
+		}
+
+		return str == "" ? toString( ) : str;
 	}
 
 	/* ------- local functions ------- */

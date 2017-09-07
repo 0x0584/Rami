@@ -11,8 +11,12 @@ public class Game {
 	public static enum TYPE {
 		SIMPLE(4, 13, true), TALAJ(4, 14, false);
 
+		/* # of maximum players in a game */
 		public final int nplayers;
+		/* # of cards in a player's hand */
 		public final int ncards;
+		/* whether taking cards from the table 
+		 * is allowed or not */
 		public final boolean tableallowed;
 
 		TYPE(final int nplayers, final int ncards, final boolean allowed) {
@@ -32,6 +36,8 @@ public class Game {
 	private final int N_PLAYERS;
 
 	private Vector<Card> table;
+	private static BufferedReader reader = new BufferedReader(
+			new InputStreamReader(System.in));
 
 	/* ------- constructors ------- */
 	public Game() {
@@ -54,22 +60,31 @@ public class Game {
 		table = new Vector<Card>( );
 	}
 
+	public static void cleanUp() {
+		Hand.cleanUp( );
+
+		try {
+			reader.close( );
+		} catch(IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace( );
+		}
+	}
+
 	/* ------- methods ------- */
 	// @SuppressWarnings("unused")
 	private Card cardSelection(boolean[] factor) {
 
 		Card selected = null;
 		String str = "";
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				System.in));
 
 		/* if taking cards from table is allowed */
 		if(factor[Card.FROM.TABLE.val]) str += "[t]\t"
-				+ table.lastElement( ).toString( ) + "\n";
+				+ table.lastElement( ).toString("%s") + "\n";
 
 		/* if it is the first turn and the fauxjoke is not token */
 		if(factor[Card.FROM.FAUXJOKER.val]) str += "[f]\t"
-				+ fauxjoke.toString( ) + "\n";
+				+ fauxjoke.toString("%s") + "\n";
 
 		if(factor[Card.FROM.RAMI.val]) str += "[r]\n$ "; /* card form rami is
 														 * always allowed */
@@ -119,13 +134,6 @@ public class Game {
 			e.printStackTrace( );
 		}
 
-		try {
-			reader.close( );
-		} catch(IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace( );
-		}
-
 		/* ---------------------- DEBUG ---------------------- */
 		if(Debug.enabled) {
 			System.out.println("selected: " + selected.toString( ));
@@ -159,9 +167,6 @@ public class Game {
 					!(deck.isEmpty( ))
 			}));
 
-			/* ---------------------- DEBUG ---------------------- */
-			if(Debug.enabled) System.out.println(current.toString( ));
-
 			/* 2. check whether you're mseket or not */
 			if(current.isMseket( )) break; /* salat a maelen */
 
@@ -170,9 +175,14 @@ public class Game {
 
 			/* ---------------------- DEBUG ---------------------- */
 			if(Debug.enabled) {
-				System.out.println(table.lastElement( ).toString( ));
+				System.out
+						.println("thrown: " + table.lastElement( ).toString( ));
 			}
 		}
+
+		System.out.println("the winner is: me!");
+
+		Game.cleanUp( );
 	}
 
 	/* ------- local functions ------- */
@@ -180,18 +190,18 @@ public class Game {
 		String strhands = "";
 
 		for(int iplayer = 0; iplayer < player.length; ++iplayer) {
-			strhands += player[iplayer].getNickname( ) + "\n\n";
+			strhands += player[iplayer].getNickname( ) + ": ";
 			for(int icard = 0; icard < gametype.ncards + 1; ++icard) {
 				if(player[iplayer].getHand( ).getCardAt(icard) != null) {
 					String strcard = player[iplayer].getHand( )
-							.getCardAt(icard).toString( );
-					strhands += strcard + "\n";
+							.getCardAt(icard).toString("%s");
+					strhands += strcard;
 				}
 			}
 			strhands += "\n";
 		}
 
-		strhands += fauxjoke.toString( ) + "\n";
+		strhands += "\nfaux: " + fauxjoke.toString("%s") + "\n";
 
 		return strhands;
 	}

@@ -74,7 +74,7 @@ public class Player {
 		 * possible hands; 3-3-3-4, 4-4-5 or 5-5-3. with at least one pure
 		 * successive and one pure suited; pure here means that this combination
 		 * was made without using a joker */
-		return false;
+		return true;
 	}
 
 	/* ------- override'd methods ------- */
