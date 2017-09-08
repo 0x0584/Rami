@@ -33,6 +33,27 @@ public class Player {
 		return c1;
 	}
 
+	private boolean isIn(Card[] part, Card.RANK... ranks) {
+		boolean[] foo = new boolean[ranks.length];
+
+		for(int i = 0, k = 0; i < part.length; i++) {
+			for(int j = 0; j < ranks.length; j++) {
+				if(part[i].getRank( ) == ranks[j]) {
+					foo[k++] = true;
+					break;
+				}
+			}
+		}
+
+		boolean isin = true;
+
+		for(int i = 0; i < foo.length; i++) {
+			isin &= foo[i];
+		}
+
+		return isin;
+	}
+
 	public boolean isSuited(Card[] part) {
 		/* TODO: implement this description
 		 * 
@@ -48,17 +69,40 @@ public class Player {
 		 * then return false
 		 * 3. */
 
-		boolean samesuit = true;
+		boolean samesuit = true, succ = true;
+		boolean use14 = isIn(part, Card.RANK.ACE, Card.RANK.KING);
 
 		for(int icard = 0; icard < part.length - 1; ++icard) {
 			samesuit &= (part[icard].getSuit( ) == part[icard + 1].getSuit( ));
 		}
 
-		for(int icard = 0; icard < part.length; ++icard) {
+		/* TODO: this is ridicules, you have to find a better way */
+		for(int i = 1; i < part.length; ++i) {
+			for(int icard = 0; icard < part.length - 1; ++icard) {
+				int card0 = part[icard].getRank( ).value;
+				int card1 = part[icard + 1].getRank( ).value;
 
+				if(card0 == Card.RANK.ACE.value && use14) card0 = 14;
+				else if(card1 == Card.RANK.ACE.value && use14) card1 = 14;
+
+				if(card0 > card1) {
+					part[icard] = swap(part[icard + 1],
+							part[icard + 1] = part[icard]);
+				}
+			}
 		}
 
-		return false;
+		for(int icard = 1; icard < part.length; icard++) {
+			int card0 = part[icard - 1].getRank( ).value;
+			int card1 = part[icard].getRank( ).value;
+
+			if(card0 == Card.RANK.ACE.value && use14) card0 = 14;
+			else if(card1 == Card.RANK.ACE.value && use14) card1 = 14;
+
+			succ &= (card1 - card0 == 1);
+		}
+
+		return samesuit && succ;
 	}
 
 	public boolean isRandked(Card[] part) {

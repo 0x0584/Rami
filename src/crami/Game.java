@@ -164,7 +164,7 @@ public class Game {
 					/* faux joker, if's the first round and not token */
 					(turn < gametype.nplayers && !(istoken)),
 					/* rami, i'm not sure if this one is necessary */
-					!(deck.isEmpty( ))
+					!deck.isEmpty( )
 			}).checkJoker(gametype, fauxjoker));
 
 			/* 2. check whether you're mseket or not */
