@@ -132,7 +132,7 @@ public class Game {
 
 		if(factor[Card.FROM.RAMI.val]) str += "[r]\n$ "; /* card form rami is
 														 * always allowed */
-		// TODO: fix the case when the rami ends..
+		// FIXME: fix the case when the rami ends..
 		else ; /* re-shuffle the deck from the rested cards */
 
 		System.out.print(str);

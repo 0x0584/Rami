@@ -174,6 +174,11 @@ public class Card {
 		isjoker = false;
 	}
 
+	public Card(BACK back, RANK rank, SUIT suit, int deckorder, boolean isjoker) {
+		this(back, rank, suit, deckorder);
+		this.isjoker = isjoker;
+	}
+
 	/* ------- getters ------- */
 	public RANK getRank() {
 		return rank;
@@ -204,7 +209,7 @@ public class Card {
 		isjoker = isit;
 	}
 
-	/* ------- public functions -------*/
+	/* ------- public functions ------- */
 	public Card checkJoker(Game.TYPE gametype, Card faux) {
 		SUIT fs = faux.getSuit( ), cs = this.getSuit( );
 		RANK fr = faux.getRank( ), cr = this.getRank( ), TWO = Card.RANK.TWO;

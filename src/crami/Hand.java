@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import crami.Hand.COMBINATION;
-
 public class Hand {
 	public static enum COMBINATION {
 		/* 4-3-3-3 :
@@ -52,7 +50,7 @@ public class Hand {
 
 	/* ------- methods ------- */
 	public boolean vefiryCombination(COMBINATION fetch) {
-		/* TODO: this is getting fucking out of control!
+		/* FIXME: this is getting fucking out of control!
 		 * 
 		 * first, detect what number of cards you want to take each time.
 		 * then, take that number, each time and verify the rule of purity */
@@ -72,7 +70,7 @@ public class Hand {
 			Card[] part = new Card[ncards[icombi]];
 
 			for(int icard = 0, index = 0; icard < ncards[icombi]; ++icombi) {
-				/* TODO: verify duplicates
+				/* FIXME: verify duplicates
 				 * 
 				 * whether the selected card has been already selected */
 				System.out.println(hand.toString( )
@@ -87,7 +85,7 @@ public class Hand {
 				part[icard] = hand[index - 1];
 			}
 
-			/* TODO: detect whether part is a suited or ranked
+			/* FIXME: detect whether part is a suited or ranked
 			 * 
 			 * that's beside the joker case! you have work to do tomorrow */
 		}

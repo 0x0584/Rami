@@ -113,64 +113,103 @@ public class Player {
 		return isin;
 	}
 
-	private boolean isSuited(Card[] part) {
-		/* TODO: implement this description in case of joker!
+	public boolean isSuited(Card[] part) {
+		/* FIXME: implement this description in case of joker!
 		 * 
 		 * Description: a suited is a set of cards which has the same
 		 * `suit` but with successive ranks.
 		 * 
 		 * (2♠)(3♠)(4♠) or (J♥)(Q♥)(K♥)(A♥) or (9♣)(10♣)(J♣)(Q♣)(K♣) */
 
-		boolean samesuit = true, succ = true;
-		boolean use14 = isIn(part, Card.RANK.ACE, Card.RANK.KING);
+		int jindex = 1, /* this is so that the we can know when we run out
+						 * of jokers */
+		MAX_JOKERS = -1; /* the number of possible jokers */
+		boolean[] joker = new boolean[4];
+		boolean samesuit = true, succ = true, use14;
+		use14 = isIn(part, Card.RANK.ACE, Card.RANK.KING, Card.RANK.QUEEN);
 
-		for(int icard = 0; icard < part.length - 1; ++icard) {
-			samesuit &= (part[icard].getSuit( ) == part[icard + 1].getSuit( ));
+		for(int i = 0; i <= part.length; ++MAX_JOKERS, i += 3);
+
+		for(int icard = 1; icard < part.length; ++icard) {
+			/* @formatter:off*/
+			boolean countjoker = part[icard - 1].isJoker( );
+			countjoker ^= (icard == (part.length - 1) && part[icard].isJoker( ));
+
+			if(countjoker) { joker[jindex++] = true; continue; }
+			/* @formatter:on */
+
+			samesuit &= (part[icard - 1].getSuit( ) == part[icard].getSuit( ));
 		}
 
-		/* TODO: this is ridicules, you have to find a better way */
-		for(int i = 1; i < part.length; ++i) {
-			for(int icard = 0; icard < part.length - 1; ++icard) {
-				int card0 = part[icard].getRank( ).value;
-				int card1 = part[icard + 1].getRank( ).value;
+		if(!samesuit) return false;
+		/* if there's more that maximum allowed jokers */
+		if((jindex - 1) > MAX_JOKERS) return false;
+
+		/* FIXME: this is ridicules, you have to find a better way */
+		for(int loop = 1; loop < part.length; ++loop) {
+			for(int icard = 1; icard < part.length; ++icard) {
+				/* @formatter:off */
+				boolean countjoker = part[icard - 1].isJoker( );
+				countjoker ^= (icard == (part.length - 1) && part[icard].isJoker( ));
+				
+				if(countjoker) continue;
+				/* @formatter:on */
+
+				int card0 = part[icard - 1].getRank( ).value;
+				int card1 = part[icard].getRank( ).value;
 
 				if(card0 == Card.RANK.ACE.value && use14) card0 = 14;
 				else if(card1 == Card.RANK.ACE.value && use14) card1 = 14;
 
 				if(card0 > card1) {
-					part[icard] = swap(part[icard + 1],
-							part[icard + 1] = part[icard]);
+					Card tmp = swap(part[icard], part[icard] = part[icard - 1]);
+					part[icard - 1] = tmp;
 				}
 			}
 		}
 
 		for(int icard = 1; icard < part.length; icard++) {
+			/* @formatter:off */
+			boolean countjoker = part[icard - 1].isJoker( );
+			countjoker ^= (icard == (part.length - 1) && part[icard].isJoker( ));
+		
+			if(countjoker) continue;
+			/* @formatter:on */
+
 			int card0 = part[icard - 1].getRank( ).value;
 			int card1 = part[icard].getRank( ).value;
 
 			if(card0 == Card.RANK.ACE.value && use14) card0 = 14;
 			else if(card1 == Card.RANK.ACE.value && use14) card1 = 14;
 
-			succ &= (card1 - card0 == 1);
+			succ &= ((card1 - card0 == 1) || (card1 - card0 == 2 && joker[--jindex]));
 		}
 
 		return samesuit && succ;
 	}
 
-	private boolean isRandked(Card[] part) {
-		/* TODO: implement this description in case of joker
+	public boolean isRandked(Card[] part) {
+		/* FIXME: implement this description in case of joker
 		 * 
 		 * Description: a ranked is a set of cards which has the same
 		 * `rank` but with different suits.
 		 * 
-		 * (A♠)(A♥)(A♣) or (J♥)(J♣)(J♠)(J♦) */
+		 * (A♠)(A♥)(A♣) or (J♥)(J♣)(J♠)(J♦)
+		 * 
+		 * done! */
 
 		if(part.length != 3 && part.length != 4) return false;
 
+		int njokers = 0;
 		boolean samerank = true, spades, clubs, hearts, diams;
 		spades = clubs = hearts = diams = false;
 
 		for(int icard = 1; icard < part.length; ++icard) {
+			if(part[icard - 1].isJoker( ) || part[icard].isJoker( )) {
+				++njokers;
+				continue;
+			}
+
 			samerank &= (part[icard - 1].getRank( ) == part[icard].getRank( ));
 
 			switch(part[icard - 1].getSuit( )) {
@@ -182,6 +221,19 @@ public class Player {
 			default:					    				  break;
 			/* @formatter:on */
 			}
+
+			/* TODO: find another way to do so */
+			if(icard == (part.length - 1)) {
+				switch(part[icard].getSuit( )) {
+				/* @formatter:off*/
+				case CLUBS:		 clubs = !(clubs)  ? true: false; break;
+				case DIAMONDS: 	 diams = !(diams)  ? true: false; break;
+				case HEARTS: 	hearts = !(hearts) ? true: false; break;
+				case SPADES: 	spades = !(spades) ? true: false; break;
+				default:					    				  break;
+				/* @formatter:on */
+				}
+			}
 		}
 
 		int suitcount = 0;
@@ -191,7 +243,9 @@ public class Player {
 			}[isuit]) ++suitcount;
 		}
 
-		return samerank && suitcount > 2;
+		if(njokers == 1) ++suitcount;
+
+		return samerank && (suitcount > 2);
 	}
 
 	/** this trick works because Java guarantees that all arguments are
