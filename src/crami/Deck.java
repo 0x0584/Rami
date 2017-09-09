@@ -39,19 +39,14 @@ public class Deck {
 
 	/* ------- methods ------- */
 	public void shuffDeck() {
-		/* TODO:
-		 * make this shuffle use modes of shuffle t make it look more
-		 * realistic.
-		 * 
-		 * done */
-		Vector<Integer> isused = new Vector<Integer>(N_CARDS);
-		/* this is how much the deck would be mixed up
+		/* this is how much the deck would be mixed-up (must be > 1)
 		 * 2 == really mixed
 		 * 3 == mixed
 		 * 4 == slightly mixed
 		 * 5 == really?
-		 * 6 == no seriously? */
+		 * 6 == no seriously? */;
 		int ratio = (randInt(5) + 2);
+		Vector<Integer> isused = new Vector<Integer>(N_CARDS);
 		int index0, index1, size = isused.capacity( );
 
 		for(int index = 0; index < size; ++index)

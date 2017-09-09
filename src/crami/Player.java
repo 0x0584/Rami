@@ -1,10 +1,18 @@
 package crami;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import crami.Game.TYPE;
+
 public class Player {
 	/* ------- local fields ------- */
 	private Score score;
 	private String nickname;
 	private Hand hand;
+	private static BufferedReader reader = new BufferedReader(
+			new InputStreamReader(System.in));
 
 	/* ------- constructors ------- */
 	public Player() {
@@ -17,22 +25,75 @@ public class Player {
 		this.nickname = nikename;
 	}
 
-	/** this trick works because Java guarantees that all arguments are
-	 * evaluated from left to right. so this trick implements the swap
-	 * method since there's no pointers in Java. so sad!
-	 * 
-	 * @usage foo = (bar, bar = foo)
-	 * 
-	 * @param c1
-	 *            the first Card
-	 * @param c1
-	 *            the second Card
-	 * 
-	 * @return c1 the first Card */
-	private Card swap(Card c1, Card c2) {
-		return c1;
+	public static void cleanUp() {
+		try {
+			reader.close( );
+		} catch(IOException ignore) {}
 	}
 
+	/* ------- getters and setters ------- */
+	public Score getScore() {
+		return score;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public Hand getHand() {
+		return hand;
+	}
+
+	public void setHand(Hand hand) {
+		this.hand = hand;
+	}
+
+	/* ------- public functions ------- */
+	public boolean isMseket(Game.TYPE gametype) {
+		return gametype == TYPE.SIMPLE ? skatSimple( ) : skatTalaj( );
+	}
+
+	private boolean skatTalaj() {
+		// TODO: create skatTalaj
+		return false;
+	}
+
+	private boolean skatSimple() {
+		/* TODO: this is the fucking problem!
+		 * 
+		 * Description:
+		 * 
+		 * the first player to have a hand that looks like one of the following
+		 * possible hands; 3-3-3-4, 4-4-5 or 5-5-3. with at least one pure
+		 * successive and one pure suited; pure here means that this combination
+		 * was made without using a joker */
+
+		System.out.print("wanna sekt? [y/N] ");
+		try {
+			if(reader.read( ) != 'y') return false;
+		} catch(IOException ignore) {}
+
+		System.out.println("what are your combination?\n" + "[1] - 3-3-3-4\n"
+				+ "[2] - 4-4-5\n" + "[3] - 5-5-3");
+
+		int foo = 0;
+		while(foo < 1 || foo > 3) {
+			try {
+				foo = reader.read( );
+			} catch(IOException ignore) {}
+		}
+
+		return hand.vefiryCombination(Hand.COMBINATION.fetch(foo));
+	}
+
+	/* ------- override'd methods ------- */
+	@Override
+	public String toString() {
+		/* nickname score hand */
+		return nickname + "\n\n" + hand.toString( );
+	}
+
+	/* ------- local functions ------- */
 	private boolean isIn(Card[] part, Card.RANK... ranks) {
 		boolean[] foo = new boolean[ranks.length];
 
@@ -47,27 +108,18 @@ public class Player {
 
 		boolean isin = true;
 
-		for(int i = 0; i < foo.length; i++) {
-			isin &= foo[i];
-		}
+		for(int i = 0; i < foo.length; isin &= foo[i], i++);
 
 		return isin;
 	}
 
-	public boolean isSuited(Card[] part) {
-		/* TODO: implement this description
+	private boolean isSuited(Card[] part) {
+		/* TODO: implement this description in case of joker!
 		 * 
 		 * Description: a suited is a set of cards which has the same
 		 * `suit` but with successive ranks.
 		 * 
-		 * (2♠)(3♠)(4♠) or (J♥)(Q♥)(K♥)(A♥) or (9♣)(10♣)(J♣)(Q♣)(K♣)
-		 * 
-		 * Algorithm:
-		 * 
-		 * 1. get the min-card and the max-card from the passed cards
-		 * 2. if the #cards != N, where N is (rank(max) - rank(min) - 1)
-		 * then return false
-		 * 3. */
+		 * (2♠)(3♠)(4♠) or (J♥)(Q♥)(K♥)(A♥) or (9♣)(10♣)(J♣)(Q♣)(K♣) */
 
 		boolean samesuit = true, succ = true;
 		boolean use14 = isIn(part, Card.RANK.ACE, Card.RANK.KING);
@@ -105,9 +157,8 @@ public class Player {
 		return samesuit && succ;
 	}
 
-	public boolean isRandked(Card[] part) {
-		/* TODO: implement this description
-		 * # in case of joker
+	private boolean isRandked(Card[] part) {
+		/* TODO: implement this description in case of joker
 		 * 
 		 * Description: a ranked is a set of cards which has the same
 		 * `rank` but with different suits.
@@ -143,39 +194,19 @@ public class Player {
 		return samerank && suitcount > 2;
 	}
 
-	public boolean isMseket() {
-		/* TODO: this is the fucking problem!
-		 * 
-		 * Description:
-		 * 
-		 * the first player to have a hand that looks like one of the following
-		 * possible hands; 3-3-3-4, 4-4-5 or 5-5-3. with at least one pure
-		 * successive and one pure suited; pure here means that this combination
-		 * was made without using a joker */
-		return true;
-	}
-
-	/* ------- override'd methods ------- */
-	@Override
-	public String toString() {
-		/* nickname score hand */
-		return nickname + "\n\n" + hand.toString( );
-	}
-
-	/* ------- getters ------- */
-	public Score getScore() {
-		return score;
-	}
-
-	public String getNickname() {
-		return nickname;
-	}
-
-	public Hand getHand() {
-		return hand;
-	}
-
-	public void setHand(Hand hand) {
-		this.hand = hand;
+	/** this trick works because Java guarantees that all arguments are
+	 * evaluated from left to right. so this trick implements the swap
+	 * method since there's no pointers in Java. so sad!
+	 * 
+	 * @usage foo = (bar, bar = foo)
+	 * 
+	 * @param c1
+	 *            the first Card
+	 * @param c1
+	 *            the second Card
+	 * 
+	 * @return c1 the first Card */
+	private Card swap(Card c1, Card c2) {
+		return c1;
 	}
 }

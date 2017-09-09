@@ -204,6 +204,7 @@ public class Card {
 		isjoker = isit;
 	}
 
+	/* ------- public functions -------*/
 	public Card checkJoker(Game.TYPE gametype, Card faux) {
 		SUIT fs = faux.getSuit( ), cs = this.getSuit( );
 		RANK fr = faux.getRank( ), cr = this.getRank( ), TWO = Card.RANK.TWO;
@@ -214,12 +215,12 @@ public class Card {
 		return this;
 	}
 
-	/* ------- override'd function ------- */
+	/* ------- override'd functions ------- */
 	@Override
 	public String toString() {
 		/* R (A♠ JOKER) Ace Of Spades */
 		return deckorder + "\t" + back.name( ).substring(0, 1) + "\t("
-				+ toSymbol( ) + (isjoker ? " JOKER" : " NOT JOKER") + ")\t"
+				+ toSymbol( ) + (isjoker ? " JOKER" : "") + ")\t"
 				+ strcap(rank.name( )) + " Of " + strcap(suit.name( ));
 
 	}

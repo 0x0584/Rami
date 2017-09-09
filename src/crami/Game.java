@@ -60,19 +60,63 @@ public class Game {
 		table = new Vector<Card>( );
 	}
 
-	public static void cleanUp() {
+	public static void cleaning() {
 		Hand.cleanUp( );
+		Player.cleanUp( );
+		Game.cleanUp( );
+	}
 
+	public static void cleanUp() {
 		try {
 			reader.close( );
-		} catch(IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace( );
-		}
+		} catch(IOException ignore) {}
 	}
 
 	/* ------- methods ------- */
-	// @SuppressWarnings("unused")
+	public void startGame() {
+		fauxjoker = deck.deal(gametype, player); /* fareq a sidi dak r'ami */
+
+		/* ---------------------- DEBUG ---------------------- */
+		if(Debug.enabled) System.out.println(initHands( ));
+
+		int turn = 0;
+		while(true) {
+			/* 0. yallah a sidi, chkon li fih laeba! */
+			Player current = player[(++turn) % N_PLAYERS];
+
+			/* --------------------- DEBUG ---------------------- */
+			if(Debug.enabled) System.out.println(current.getNickname( )
+					+ ", please, select an option:\n\n");
+			/* 1.1 select a card first */
+			/* 1.2 then, insert the selected card in hand */
+			current.getHand( ).insertCard(cardSelection(new boolean[] {
+					/* table, if allowed and not empty */
+					(gametype.tableallowed && !(table.isEmpty( ))),
+					/* faux joker, if's the first round and not token */
+					(turn < gametype.nplayers && !(istoken)),
+					/* rami, i'm not sure if this one is necessary */
+					!deck.isEmpty( )
+			}).checkJoker(gametype, fauxjoker));
+
+			/* 2. check whether you're mseket or not */
+			if(current.isMseket(gametype)) break; /* salat a maelen */
+
+			/* 3. if not mseket, throw a card */
+			table.add(current.getHand( ).throwCard( )); /* throw a card */
+
+			/* ---------------------- DEBUG ---------------------- */
+			if(Debug.enabled) {
+				System.out
+						.println("thrown: " + table.lastElement( ).toString( ));
+			}
+		}
+
+		System.out.println("the winner is: me!");
+
+		Game.cleaning( );
+	}
+
+	/* ------- local functions ------- */
 	private Card cardSelection(boolean[] factor) {
 
 		Card selected = null;
@@ -95,13 +139,11 @@ public class Game {
 
 		/* getting from where the player would take the card */
 
-		Card.FROM tmp = FROM.NULL;
 		try {
+			Card.FROM tmp = FROM.NULL;
 			while(tmp == FROM.NULL) {
 				String strerr = "";
-				tmp = Card.FROM.fetch(reader.readLine( )
-						.toLowerCase(Locale.getDefault( )).charAt(0));
-				switch(tmp) {
+				switch(tmp = Card.FROM.fetch(reader.read())) {
 				/* @formatter:off*/
 			case 	 RAMI: selected = deck.pickCard( ); 	break;
 			case 	TABLE: if(factor[Card.FROM.TABLE.val]) {
@@ -129,10 +171,7 @@ public class Game {
 
 				System.out.print(strerr);
 			}
-		} catch(IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace( );
-		}
+		} catch(IOException ignore) {}
 
 		/* ---------------------- DEBUG ---------------------- */
 		if(Debug.enabled) {
@@ -142,50 +181,6 @@ public class Game {
 		return selected;
 	}
 
-	public void startGame() {
-		fauxjoker = deck.deal(gametype, player); /* fareq a sidi dak r'ami */
-
-		/* ---------------------- DEBUG ---------------------- */
-		if(Debug.enabled) System.out.println(initHands( ));
-
-		int turn = 0;
-		while(true) {
-			/* 0. yallah a sidi, chkon li fih laeba! */
-			Player current = player[(++turn) % N_PLAYERS];
-
-			/* --------------------- DEBUG ---------------------- */
-			if(Debug.enabled) System.out.println(current.getNickname( )
-					+ ", please, select an option:\n\n");
-			/* 1.1 select a card first */
-			/* 1.2 then, insert the selected card in hand */
-			current.getHand( ).insertCard(cardSelection(new boolean[] {
-					/* table, if allowed and not empty */
-					(gametype.tableallowed && !(table.isEmpty( ))),
-					/* faux joker, if's the first round and not token */
-					(turn < gametype.nplayers && !(istoken)),
-					/* rami, i'm not sure if this one is necessary */
-					!deck.isEmpty( )
-			}).checkJoker(gametype, fauxjoker));
-
-			/* 2. check whether you're mseket or not */
-			if(current.isMseket( )) break; /* salat a maelen */
-
-			/* 3. if not mseket, throw a card */
-			table.add(current.getHand( ).throwCard( )); /* throw a card */
-
-			/* ---------------------- DEBUG ---------------------- */
-			if(Debug.enabled) {
-				System.out
-						.println("thrown: " + table.lastElement( ).toString( ));
-			}
-		}
-
-		System.out.println("the winner is: me!");
-
-		Game.cleanUp( );
-	}
-
-	/* ------- local functions ------- */
 	private String initHands() {
 		String strhands = "";
 
