@@ -57,7 +57,8 @@ public class Deck {
 			index1 = pickRandElement(isused, size--);
 
 			/* usage foo = (bar, bar = foo) */
-			card[index0] = swap(card[index1], card[index1] = card[index0]);
+			card[index0] = Utils
+					.swap(card[index1], card[index1] = card[index0]);
 		}
 
 		// for(int index = 0; index < N_CARDS; ++index)
@@ -160,21 +161,4 @@ public class Deck {
 
 		return foo;
 	}
-
-	/** this trick works because Java guarantees that all arguments are
-	 * evaluated from left to right. so this trick implements the swap
-	 * method since there's no pointers in Java. so sad!
-	 * 
-	 * @usage foo = (bar, bar = foo)
-	 * 
-	 * @param c1
-	 *            the first Card
-	 * @param c1
-	 *            the second Card
-	 * 
-	 * @return c1 the first Card */
-	private Card swap(Card c1, Card c2) {
-		return c1;
-	}
-
 }

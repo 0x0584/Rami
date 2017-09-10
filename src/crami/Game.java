@@ -1,6 +1,5 @@
 package crami;
 
-import java.util.Locale;
 import java.util.Vector;
 import java.io.*;
 
@@ -32,7 +31,7 @@ public class Game {
 	private Card fauxjoker;
 	private boolean istoken;
 
-	private Player[] player;
+	private Player[] players;
 	private final int N_PLAYERS;
 
 	private Vector<Card> table;
@@ -42,7 +41,7 @@ public class Game {
 	/* ------- constructors ------- */
 	public Game() {
 		deck = null;
-		player = null;
+		players = null;
 		gametype = TYPE.SIMPLE;
 		N_PLAYERS = 0;
 		fauxjoker = null;
@@ -52,7 +51,7 @@ public class Game {
 
 	public Game(TYPE gametype, Player[] players) {
 		deck = new Deck(true);
-		this.player = players;
+		this.players = players;
 		this.N_PLAYERS = players.length;
 		this.gametype = gametype;
 		fauxjoker = null;
@@ -74,15 +73,16 @@ public class Game {
 
 	/* ------- methods ------- */
 	public void startGame() {
-		fauxjoker = deck.deal(gametype, player); /* fareq a sidi dak r'ami */
+		fauxjoker = deck.deal(gametype, players); /* fareq a sidi dak r'ami */
 
 		/* ---------------------- DEBUG ---------------------- */
-		if(Debug.enabled) System.out.println(initHands( ));
+		if(Debug.enabled) System.out.println(initHands( ) + "\n"
+				+ fauxjoker.toString( ));
 
 		int turn = 0;
 		while(true) {
 			/* 0. yallah a sidi, chkon li fih laeba! */
-			Player current = player[(++turn) % N_PLAYERS];
+			Player current = players[(++turn) % N_PLAYERS];
 
 			/* --------------------- DEBUG ---------------------- */
 			if(Debug.enabled) System.out.println(current.getNickname( )
@@ -107,7 +107,7 @@ public class Game {
 			/* ---------------------- DEBUG ---------------------- */
 			if(Debug.enabled) {
 				System.out
-						.println("thrown: " + table.lastElement( ).toString( ));
+						.printf("thrown: %s", table.lastElement( ).toString( ));
 			}
 		}
 
@@ -139,39 +139,40 @@ public class Game {
 
 		/* getting from where the player would take the card */
 
-		try {
-			Card.FROM tmp = FROM.NULL;
-			while(tmp == FROM.NULL) {
-				String strerr = "";
-				switch(tmp = Card.FROM.fetch(reader.read())) {
+		Card.FROM tmp = FROM.NULL;
+		while(tmp == FROM.NULL) {
+			String strerr = "";
+			try {
+				switch(tmp = Card.FROM
+						.fetch(Integer.parseInt(reader.readLine( )))) {
 				/* @formatter:off*/
-			case 	 RAMI: selected = deck.pickCard( ); 	break;
-			case 	TABLE: if(factor[Card.FROM.TABLE.val]) {
-							  selected = table.lastElement( );
-							  strerr = "";
-						   } else { 
-							   tmp = Card.FROM.NULL;	
-							   strerr += "taking cards from ";
-							   strerr += "table is not allowed\n";
-						   }
-															break;
-			case FAUXJOKER: if(factor[Card.FROM.FAUXJOKER.val]) { 
-							  selected = fauxjoker; 
-							  istoken = true;
-							  strerr = "";
-						   } else {
-							   strerr = "faux is not available\n";
-							   tmp = Card.FROM.NULL;
-						   }
-															break;
-			default: 
-			case     NULL: strerr = "ERR\n";
-			/* @formatter:on */
+				case 	 RAMI: selected = deck.pickCard( ); 	break;
+				case 	TABLE: if(factor[Card.FROM.TABLE.val]) {
+								  selected = table.lastElement( );
+								  strerr = "";
+							   } else { 
+								   tmp = Card.FROM.NULL;	
+								   strerr += "taking cards from ";
+								   strerr += "table is not allowed\n";
+							   }
+																break;
+				case FAUXJOKER: if(factor[Card.FROM.FAUXJOKER.val]) { 
+								  selected = fauxjoker; 
+								  istoken = true;
+								  strerr = "";
+							   } else {
+								   strerr = "faux is not available\n";
+								   tmp = Card.FROM.NULL;
+							   }
+																break;
+				default: 
+				case     NULL: strerr = "ERR\n";
+				/* @formatter:on */
 				}
+			} catch(IOException ignore) {}
 
-				System.out.print(strerr);
-			}
-		} catch(IOException ignore) {}
+			System.out.print(strerr);
+		}
 
 		/* ---------------------- DEBUG ---------------------- */
 		if(Debug.enabled) {
@@ -184,11 +185,11 @@ public class Game {
 	private String initHands() {
 		String strhands = "";
 
-		for(int iplayer = 0; iplayer < player.length; ++iplayer) {
-			strhands += player[iplayer].getNickname( ) + ": ";
+		for(int iplayer = 0; iplayer < players.length; ++iplayer) {
+			strhands += players[iplayer].getNickname( ) + ": ";
 			for(int icard = 0; icard < gametype.ncards + 1; ++icard) {
-				if(player[iplayer].getHand( ).getCardAt(icard) != null) {
-					String strcard = player[iplayer].getHand( )
+				if(players[iplayer].getHand( ).getCardAt(icard) != null) {
+					String strcard = players[iplayer].getHand( )
 							.getCardAt(icard).toString("%s%j");
 					strhands += strcard;
 				}

@@ -1,12 +1,12 @@
-      12 text files.
-classified 12 files      12 unique files.                              
+      13 text files.
+classified 13 files      13 unique files.                              
        6 files ignored.
 
-github.com/AlDanial/cloc v 1.70  T=0.10 s (79.9 files/s, 10346.3 lines/s)
+github.com/AlDanial/cloc v 1.70  T=0.11 s (85.0 files/s, 11845.9 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Java                             8            196            162            678
+Java                             9            245            194            816
 -------------------------------------------------------------------------------
-SUM:                             8            196            162            678
+SUM:                             9            245            194            816
 -------------------------------------------------------------------------------
