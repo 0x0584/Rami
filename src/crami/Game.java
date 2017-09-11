@@ -1,9 +1,6 @@
 package crami;
 
 import java.util.Vector;
-import java.io.*;
-
-import crami.Card.FROM;
 
 public class Game {
 	/* ------- enumerations ------- */
@@ -35,8 +32,6 @@ public class Game {
 	private final int N_PLAYERS;
 
 	private Vector<Card> table;
-	private static BufferedReader reader = new BufferedReader(
-			new InputStreamReader(System.in));
 
 	/* ------- constructors ------- */
 	public Game() {
@@ -59,18 +54,6 @@ public class Game {
 		table = new Vector<Card>( );
 	}
 
-	public static void cleaning() {
-		Hand.cleanUp( );
-		Player.cleanUp( );
-		Game.cleanUp( );
-	}
-
-	public static void cleanUp() {
-		try {
-			reader.close( );
-		} catch(IOException ignore) {}
-	}
-
 	/* ------- methods ------- */
 	public void startGame() {
 		fauxjoker = deck.deal(gametype, players); /* fareq a sidi dak r'ami */
@@ -80,9 +63,10 @@ public class Game {
 				+ fauxjoker.toString( ));
 
 		int turn = 0;
+		Player current;
 		while(true) {
 			/* 0. yallah a sidi, chkon li fih laeba! */
-			Player current = players[(++turn) % N_PLAYERS];
+			current = players[(++turn) % N_PLAYERS];
 
 			/* --------------------- DEBUG ---------------------- */
 			if(Debug.enabled) System.out.println(current.getNickname( )
@@ -111,9 +95,9 @@ public class Game {
 			}
 		}
 
-		System.out.println("the winner is: me!");
+		System.out.printf("the winner is: %s!", current.toString( ));
 
-		Game.cleaning( );
+		Utils.cleaner( );
 	}
 
 	/* ------- local functions ------- */
@@ -138,38 +122,35 @@ public class Game {
 		System.out.print(str);
 
 		/* getting from where the player would take the card */
-
-		Card.FROM tmp = FROM.NULL;
-		while(tmp == FROM.NULL) {
+		Card.FROM tmp = Card.FROM.NULL;
+		while(tmp == Card.FROM.NULL) {
 			String strerr = "";
-			try {
-				switch(tmp = Card.FROM
-						.fetch(Integer.parseInt(reader.readLine( )))) {
-				/* @formatter:off*/
-				case 	 RAMI: selected = deck.pickCard( ); 	break;
-				case 	TABLE: if(factor[Card.FROM.TABLE.val]) {
-								  selected = table.lastElement( );
-								  strerr = "";
-							   } else { 
-								   tmp = Card.FROM.NULL;	
-								   strerr += "taking cards from ";
-								   strerr += "table is not allowed\n";
-							   }
-																break;
-				case FAUXJOKER: if(factor[Card.FROM.FAUXJOKER.val]) { 
-								  selected = fauxjoker; 
-								  istoken = true;
-								  strerr = "";
-							   } else {
-								   strerr = "faux is not available\n";
-								   tmp = Card.FROM.NULL;
-							   }
-																break;
-				default: 
-				case     NULL: strerr = "ERR\n";
-				/* @formatter:on */
-				}
-			} catch(IOException ignore) {}
+
+			switch(tmp = Card.FROM.fetch(Utils.getChar( ))) {
+			/* @formatter:off*/
+			case 	 RAMI: selected = deck.pickCard( ); 	break;
+			case 	TABLE: if(factor[Card.FROM.TABLE.val]) {
+							  selected = table.lastElement( );
+							  strerr += "";
+						   } else { 
+							   tmp = Card.FROM.NULL;	
+							   strerr += "taking cards from ";
+							   strerr += "table is not allowed\n";
+						   }
+															break;
+			case FAUXJOKER: if(factor[Card.FROM.FAUXJOKER.val]) { 
+							  selected = fauxjoker; 
+							  istoken = true;
+							  strerr += "";
+						   } else {
+							   strerr += "faux is not available\n";
+							   tmp = Card.FROM.NULL;
+						   }
+															break;
+			/* @formatter:on */
+			default:
+			break;
+			}
 
 			System.out.print(strerr);
 		}
@@ -189,8 +170,9 @@ public class Game {
 			strhands += players[iplayer].getNickname( ) + ": ";
 			for(int icard = 0; icard < gametype.ncards + 1; ++icard) {
 				if(players[iplayer].getHand( ).getCardAt(icard) != null) {
-					String strcard = players[iplayer].getHand( )
-							.getCardAt(icard).toString("%s%j");
+					String strcard;
+					strcard = players[iplayer].getHand( ).getCardAt(icard)
+							.toString("%s%j");
 					strhands += strcard;
 				}
 			}

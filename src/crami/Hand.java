@@ -1,9 +1,5 @@
 package crami;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 public class Hand {
 	public static enum COMBINATION {
 		/* 4-3-3-3 :
@@ -41,10 +37,9 @@ public class Hand {
 	}
 
 	private Card[] hand;
+	private Card skat;
 	private Game.TYPE gametype;
 	private int lastindex; /* this is the index of the last card in-card */
-	private static BufferedReader reader = new BufferedReader(
-			new InputStreamReader(System.in));
 
 	public Hand(Card[] hand, Game.TYPE gametype) {
 		this.hand = hand;
@@ -52,27 +47,20 @@ public class Hand {
 		lastindex = gametype.ncards;
 	}
 
-	static public void cleanUp() {
-		try {
-			reader.close( );
-		} catch(IOException ignore) {}
-	}
-
 	/* ------- getters ------- */
 	public Card getCardAt(int index) {
 		return (index >= 0 && index <= gametype.ncards) ? hand[index] : null;
+	}
+
+	public Card getSkat() {
+		return skat;
 	}
 
 	/* zarhouni */
 
 	/* ------- methods ------- */
 	public boolean vefiryCombination(COMBINATION fetch) {
-		/* FIXME: this is getting fucking out of control!
-		 * 
-		 * first, detect what number of cards you want to take each time.
-		 * then, take that number, each time and verify the rule of purity */
-
-		int combins[];
+		int[] combins;
 		final int NCOMBINATIONS;
 
 		COMBI_STATE combinstates[];
@@ -89,6 +77,8 @@ public class Hand {
 		/* @formatter:on */
 		}
 
+		if(Debug.enabled) System.out.println(fetch.name( ));
+
 		NCOMBINATIONS = combins.length;
 		combinstates = new COMBI_STATE[NCOMBINATIONS];
 		combinstypes = new COMBI_TYPE[NCOMBINATIONS];
@@ -99,27 +89,17 @@ public class Hand {
 			System.out.printf("%d cards combination\n", combins[icombi]);
 
 			/* 1.2 grab the combination */
-			for(int icard = 0, index = 0; icard < combins[icombi]; ++icard) {
+			for(int icard = 0; icard < combins[icombi]; ++icard) {
 				/* FIXME: verify duplicates
 				 * 
 				 * whether the selected card has been already selected */
-				System.out.printf("%s\nselect a card from 1 to %d ",
+				String str = String.format("%s\nselect a card from 1 to %d ",
 						toString( ), (gametype.ncards + 1));
 
-				/* TODO: add this to Utils */
-				while(index < 1 || index > 15) {
-					try {
-						index = Integer.parseInt(reader.readLine( ));
-					} catch(NumberFormatException | IOException ignore) {}
-				}
+				int index = Utils.getInt(str, 1, (gametype.ncards + 1));
 
 				combination[icard] = hand[index - 1];
-				index = 0;
 			}
-
-			/* FIXME: detect whether part is a suited or ranked
-			 * 
-			 * that's beside the joker case! you have work to do tomorrow */
 
 			COMBI_STATE tmp = COMBI_STATE.NULL;
 
@@ -146,7 +126,9 @@ public class Hand {
 				} else puresuit = true;
 			}
 
-			if(pureranked && puresuit) break;
+			if(pureranked && puresuit) {
+				break;
+			}
 		}
 
 		return pureranked && puresuit;
@@ -173,12 +155,16 @@ public class Hand {
 	}
 
 	private COMBI_STATE isSuited(Card[] part) {
-		/* FIXME: implement this description in case of joker!
-		 * 
-		 * Description: a suited is a set of cards which has the same
+		/* Description: a suited is a set of cards which has the same
 		 * `suit` but with successive ranks.
 		 * 
-		 * (2♠)(3♠)(4♠) or (J♥)(Q♥)(K♥)(A♥) or (9♣)(10♣)(J♣)(Q♣)(K♣) */
+		 * * examples:
+		 * 
+		 * (2♠)(3♠)(4♠) or (J♥)(JOKER)(K♥)(A♥) or (9♣)(10♣)(J♣)(Q♣)(K♣)
+		 * 
+		 * * in case combinations that has more than 5 cards:
+		 * 
+		 * (9♣)(10♣)(J♣)(Q♣)(K♣)(A♣) == (9♣)(10♣)(J♣) + (Q♣)(K♣)(A♣) */
 
 		boolean[] joker = new boolean[4];
 		boolean samesuit = true, succ = true, use14;
@@ -265,14 +251,10 @@ public class Hand {
 	}
 
 	private COMBI_STATE isRandked(Card[] part) {
-		/* FIXME: implement this description in case of joker
-		 * 
-		 * Description: a ranked is a set of cards which has the same
+		/* Description: a ranked is a set of cards which has the same
 		 * `rank` but with different suits.
 		 * 
-		 * (A♠)(A♥)(A♣) or (J♥)(J♣)(J♠)(J♦)
-		 * 
-		 * done! */
+		 * (A♠)(A♥)(A♣) or (J♥)(J♣)(J♠)(J♦) */
 		final int NCARDS = part.length;
 
 		/* (A♠)(A♥)(A♣) or (J♥)(J♣)(J♠)(J♦) */
@@ -353,17 +335,7 @@ public class Hand {
 		/* ---------------------- DEBUG ---------------------- */
 		if(Debug.enabled) System.out.println("before:\n" + toString( ));
 
-		int tmp = -1;
-		while(tmp < 1 || tmp > (gametype.ncards + 1)) {
-			System.out.println("chose a card from 1 to "
-					+ (gametype.ncards + 1));
-
-			try {
-				tmp = Integer.parseInt(reader.readLine( ));
-			} catch(NumberFormatException | IOException ignore) {}
-
-			lastindex = tmp - 1;
-		}
+		lastindex = Utils.getInt("", 1, (gametype.ncards + 1)) - 1;
 
 		Card it = hand[lastindex];
 		hand[lastindex] = null;
@@ -378,8 +350,9 @@ public class Hand {
 	public String toString() {
 		String str = "";
 
-		for(int i = 0; i <= gametype.ncards; ++i)
+		for(int i = 0; i <= gametype.ncards; ++i) {
 			if(hand[i] != null) str += hand[i].toString("%s%j");
+		}
 
 		return str + "\n";
 	}

@@ -57,8 +57,9 @@ public class Deck {
 			index1 = pickRandElement(isused, size--);
 
 			/* usage foo = (bar, bar = foo) */
-			card[index0] = Utils
-					.swap(card[index1], card[index1] = card[index0]);
+			Card tmp;
+			tmp = Utils.swap(card[index1], card[index1] = card[index0]);
+			card[index0] = tmp;
 		}
 
 		// for(int index = 0; index < N_CARDS; ++index)
@@ -102,6 +103,27 @@ public class Deck {
 			players[iplayer].setHand(new Hand(hand[iplayer], gametype));
 		}
 
+		
+		players[1] = new Player("this", new Hand(new Card[] {
+				new Card(Card.BACK.BLUE, Card.RANK.ACE, Card.SUIT.CLUBS, 10),
+				new Card(Card.BACK.BLUE, Card.RANK.TWO, Card.SUIT.CLUBS, 10),
+				new Card(Card.BACK.BLUE, Card.RANK.THREE, Card.SUIT.CLUBS, 10),
+				new Card(Card.BACK.BLUE, Card.RANK.FOUR, Card.SUIT.CLUBS, 10),
+				
+				new Card(Card.BACK.BLUE, Card.RANK.KING, Card.SUIT.CLUBS, 10),
+				new Card(Card.BACK.BLUE, Card.RANK.KING, Card.SUIT.HEARTS, 10),
+				new Card(Card.BACK.BLUE, Card.RANK.KING, Card.SUIT.SPADES, 10),
+				
+				new Card(Card.BACK.BLUE, Card.RANK.ACE, Card.SUIT.HEARTS, 10),
+				new Card(Card.BACK.BLUE, Card.RANK.ACE, Card.SUIT.CLUBS, 10),
+				new Card(Card.BACK.BLUE, Card.RANK.ACE, Card.SUIT.DIAMONDS, 10),
+				
+				new Card(Card.BACK.BLUE, Card.RANK.TWO, Card.SUIT.CLUBS, 10),
+				new Card(Card.BACK.BLUE, Card.RANK.TWO, Card.SUIT.HEARTS, 10),
+				new Card(Card.BACK.BLUE, Card.RANK.TWO, Card.SUIT.DIAMONDS, 10),
+				
+				null
+		}, Game.TYPE.SIMPLE));
 		return faux;/* fauxjoke */
 	}
 
