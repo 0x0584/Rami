@@ -7,10 +7,9 @@ package crami;
 public class Main {
 	public static void main(String[] args) {
 		Debug.On( );
+//		testing( );
 
-		testing( );
-
-		run( );
+		 run( );
 	}
 
 	public static void run() {
@@ -21,6 +20,16 @@ public class Main {
 	}
 
 	public static void testing() {
+		int[] test = new int[] {
+				1, 2, 3, 4, 5
+		};
+		for(int i = 0; i < test.length; i++) {
+			System.out.printf("%d %s", test[i], i == test.length - 1 ? "\n"
+					: "");
+		}
+
+		boolean takeit = true;
+		System.out.printf("%d", Utils.getInt("$ " + !takeit, 0, 10, !takeit, test));
 
 	}
 }

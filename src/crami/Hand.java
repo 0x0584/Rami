@@ -60,11 +60,13 @@ public class Hand {
 
 	/* ------- methods ------- */
 	public boolean vefiryCombination(COMBINATION fetch) {
-		int[] combins;
+
+		int[] combins, selected = new int[13];
 		final int NCOMBINATIONS;
 
 		COMBI_STATE combinstates[];
 		COMBI_TYPE combinstypes[];
+
 		boolean pureranked = false, puresuit = false;
 
 		/* 0. check combination's type */
@@ -134,26 +136,6 @@ public class Hand {
 		return pureranked && puresuit;
 	}
 
-	private boolean isIn(Card[] part, Card.RANK... ranks) {
-		boolean[] exists = new boolean[ranks.length];
-
-		for(int icard = 0, ie = 0; icard < part.length; icard++) {
-			for(int irank = 0; irank < ranks.length; irank++) {
-				if(part[icard].getRank( ) == ranks[irank]) {
-					exists[ie++] = true;
-					break;
-				}
-			}
-		}
-
-		/* true if all the cards exists. otherwise false */
-		boolean isin = true;
-
-		for(int ie = 0; ie < exists.length; isin &= exists[ie], ie++);
-
-		return isin;
-	}
-
 	private COMBI_STATE isSuited(Card[] part) {
 		/* Description: a suited is a set of cards which has the same
 		 * `suit` but with successive ranks.
@@ -177,7 +159,8 @@ public class Hand {
 		for(int i = 0; i <= NCARDS; ++MAX_JOKERS, i += 3);
 
 		/* 0.2 using the Ace as 1 or 14 */
-		use14 = isIn(part, Card.RANK.ACE, Card.RANK.KING, Card.RANK.QUEEN);
+		use14 = Utils.isIn(part, false, Card.RANK.ACE, Card.RANK.KING,
+				Card.RANK.QUEEN);
 
 		/* 1.1 checking whether the cards have the same suit */
 		for(int icard1 = 1, end = (NCARDS - 1); icard1 < NCARDS; ++icard1) {
